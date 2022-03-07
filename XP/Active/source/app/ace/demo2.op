@@ -36,6 +36,8 @@ Entity { Component: ID: Item 1 }
 				core.call("move: Item 1: 0, 0, .05");
 			-
 
+#[
+
 Entity { Component: ID: Test 1 }
 
 	Component: Ground
@@ -46,3 +48,5 @@ Entity { Component: ID: Test 1 }
 		width: 10000
 		length: 10000
 		height: 60
+
+ ]#

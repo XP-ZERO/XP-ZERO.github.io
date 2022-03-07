@@ -1,0 +1,1008 @@
+-
+	var moduleDependencies = {
+		one: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONE.js",
+		philosophersStone: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Philosophers-Stone/master/Philosopher's%20Stone/API/PhilosophersStone.js",
+		ui: "https://raw.githubusercontent.com/Gallery-of-Kaeon/JavaScript-Utilities/master/JavaScript%20Utilities/Utilities/UI/Visual/General/ui.js"
+	};
+	
+	var one = require(moduleDependencies.one);
+	var philosophersStone = require(moduleDependencies.philosophersStone);
+	var ui = require(moduleDependencies.ui);
+	
+	function loadComponent(core, ace, entity) {
+		
+		core.modules.forEach(
+			function(item) {
+	
+				if(item.onDeserialize != null)
+					item.onDeserialize(core, ace, entity);
+			}
+		);
+	}
+	
+	function loadEntity(core, ace, entity) {
+		
+		entity =
+			entity != null ?
+				entity :
+				{ parent: null, children: [], components: [] };
+	
+		ace.children.forEach(
+			function(item) {
+				
+				if(item.content.toLowerCase() == "entity") {
+	
+					let child = loadEntity(core, item);
+					child.parent = entity;
+	
+					entity.children.push(child);
+				}
+	
+				else if(item.content.toLowerCase() == "component")
+					loadComponent(core, item, entity);
+	
+				else
+					loadEntity(core, item, entity);
+			}
+		);
+	
+		return entity;
+	}
+	
+	function run(core, ace, element) {
+	
+		core.ace = ace != null ? ace : new one.Element();
+		core.element = element != null ? element : document.documentElement;
+	
+		core.modules =
+			philosophersStone.retrieve(
+				philosophersStone.traverse(core),
+				function(item) {
+					return philosophersStone.isTagged(item, "Kaeon ACE");
+				}
+			);
+	
+		core.element.addEventListener(
+			"contextmenu",
+			function(event) {
+				event.preventDefault();
+			}
+		);
+	
+		core.element.addEventListener(
+			"mousedown",
+			function(event) {
+				
+				if(event.button == 1)
+					event.preventDefault();
+			}
+		);
+	
+		ui.load("https://preview.babylonjs.com/babylon.js");
+		ui.load("https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js");
+		ui.load("https://code.jquery.com/pep/0.4.3/pep.js");
+		
+		ui.extend(
+			ui.set(
+				core.element,
+				{
+					style: {
+						overflow: "hidden",
+						margin: 0,
+						padding: 0
+					}
+				}
+			),
+			ui.create(
+				{
+					tag: "canvas",
+					attributes: {
+						id: "renderCanvas",
+						"touch-action": "none"
+					},
+					style: {
+						position: "absolute",
+						left: "0%",
+						top: "0%",
+						width: "100%",
+						height: "100%",
+						"touch-action": "none"
+					}
+				}
+			)
+		);
+		
+		core.canvas = document.getElementById("renderCanvas");
+		core.engine = new BABYLON.Engine(core.canvas, true);
+		
+		core.entity = { parent: null, children: [], components: {} };
+		
+		core.scene = new BABYLON.Scene(core.engine);
+	
+		core.scene.preventDefaultOnPointerDown = false;
+	    	core.scene.clearColor = new BABYLON.Color3.Black;
+		
+		core.camera =
+			new BABYLON.UniversalCamera(
+				"UniversalCamera",
+				new BABYLON.Vector3(0, 0, -10),
+				core.scene
+			);
+	
+		core.time = (new Date()).getTime();
+	
+		xr(core);
+		
+		core.modules.forEach(
+			function(item) {
+	
+				philosophersStone.connect(core, item, null, true);
+		
+				if(item.onDefault != null)
+					item.onDefault(core);
+			}
+		);
+	
+		core.call = function(data) {
+			
+			let result = [];
+	
+			for(let i = 0; i < core.modules.length; i++) {
+	
+				if(core.modules[i].onCall == null)
+					continue;
+				
+				let response = core.modules[i].onCall(core, data);
+	
+				if(response != null)
+					result.push("" + response);
+			}
+			
+			return result;
+		}
+	
+		core.entity.children.push(loadEntity(core, core.ace));
+			
+		core.engine.runRenderLoop(
+			function() {
+	
+				if(core.canvas.parentNode != core.element)
+					core.engine.stopRenderLoop();
+	
+				else {
+	
+					let time = (new Date()).getTime();
+					let delta = (time - core.time) / 1000;
+			
+					core.modules.forEach(
+						function(item) {
+	
+							try {
+					
+								if(item.onUpdate != null)
+									item.onUpdate(core, delta);
+	
+							}
+	
+							catch(error) {
+	
+							}
+						}
+					);
+		
+					core.time = time;
+			
+					core.scene.render();
+				}
+			}
+		);
+		
+		window.addEventListener(
+			"resize",
+			function() {
+				core.engine.resize();
+			}
+		);
+	}
+	
+	async function xr(core) {
+		await core.scene.createDefaultXRExperienceAsync();
+	}
+	
+	module.exports = {
+		run
+	};
+-
+	-
+		KaeonACE.js
+	-
+-
+	/*
+	
+		on call: take core and data string, return string
+		on default: take core
+		on deserialize: take core, ace, and entity, modify entity
+		on entity: take core, entity, and delta
+		on serialize: take core and entity, return a ONE list form element or null
+		on update: take core and delta
+	
+	 */
+	
+	var moduleDependencies = {
+		modules: {
+			cameraModules: "cameraModules.js",
+			geometryModules: "geometryModules.js",
+			miscModules: "miscModules.js",
+			standardModules: "standardModules.js"
+		},
+		philosophersStone: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Philosophers-Stone/master/Philosopher's%20Stone/API/PhilosophersStone.js",
+	};
+	
+	var philosophersStone = require(moduleDependencies.philosophersStone);
+	
+	module.exports = function(core) {
+	
+		let modules = [];
+		
+		Object.values(moduleDependencies.modules).forEach((unit) => {
+			modules = modules.concat(require(unit));
+		});
+	
+		for(let i = 0; i < modules.length; i++) {
+	
+			modules[i].tags = modules[i].tags ?
+				modules[i].tags.concat(["Kaeon ACE"]) :
+				["Kaeon ACE"];
+	
+			philosophersStone.connect(core, modules[i], [], true);
+		}
+	};
+-
+	-
+		standardKaeonACE.js
+	-
+-
+	var io = require("kaeon-united").modules.io();
+	var onePlus = require("kaeon-united").modules.onePlus();
+	var widgets = require("kaeon-united").modules.widgets();
+	
+	function startGame(element) {
+	
+		try {
+	
+			var core = {};
+			
+			require("standardKaeonACE.js")(core);
+		
+			require("KaeonACE.js").run(
+				core,
+				onePlus.readONEPlus(io.open("Game.op")),
+				element
+			);
+		}
+	
+		catch(error) {
+			console.log(error.stack);
+		}
+	}
+	
+	widgets.createStartScreen(document.documentElement, "Start", startGame);
+-
+	-
+		source.js
+	-
+-
+	var moduleDependencies = {
+		one: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONE.js",
+	};
+	
+	var one = require(moduleDependencies.one);
+	
+	var camera = {
+	
+		controlOn: false,
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			if(one.getChild(ace, "camera control") != null)
+				this.controlOn = true;
+		},
+	
+		onUpdate: function(core, delta) {
+	
+			if(!this.controlOn)
+				return;
+	
+			if(core.input.pc.keyboard.includes(37)) { // LEFT
+				core.camera.rotation.x -= .015 * Math.sin(-core.camera.rotation.z);
+				core.camera.rotation.y -= .015 * Math.cos(-core.camera.rotation.z);
+			}
+	
+			if(core.input.pc.keyboard.includes(39)) { // RIGHT
+				core.camera.rotation.x += .015 * Math.sin(-core.camera.rotation.z);
+				core.camera.rotation.y += .015 * Math.cos(-core.camera.rotation.z);
+			}
+	
+			if(core.input.pc.keyboard.includes(38)) { // UP
+				core.camera.rotation.x -= .015 * Math.cos(-core.camera.rotation.z);
+				core.camera.rotation.y += .015 * Math.sin(-core.camera.rotation.z);
+			}
+	
+			if(core.input.pc.keyboard.includes(40)) { // DOWN
+				core.camera.rotation.x += .015 * Math.cos(-core.camera.rotation.z);
+				core.camera.rotation.y -= .015 * Math.sin(-core.camera.rotation.z);
+			}
+	
+			if(core.input.pc.keyboard.includes(83)) { // S
+				core.camera.position.x += .25 * Math.sin(-core.camera.rotation.y) * Math.cos(-core.camera.rotation.x);
+				core.camera.position.y -= .25 * Math.sin(-core.camera.rotation.x);
+				core.camera.position.z -= .25 * Math.cos(-core.camera.rotation.y) * Math.cos(-core.camera.rotation.x);
+			}
+	
+			if(core.input.pc.keyboard.includes(87)) { // W
+				core.camera.position.x -= .25 * Math.sin(-core.camera.rotation.y) * Math.cos(-core.camera.rotation.x);
+				core.camera.position.y += .25 * Math.sin(-core.camera.rotation.x);
+				core.camera.position.z += .25 * Math.cos(-core.camera.rotation.y) * Math.cos(-core.camera.rotation.x);
+			}
+	
+			if(core.input.pc.keyboard.includes(68)) { // D
+				core.camera.position.x += .25 * Math.cos(-core.camera.rotation.y) * Math.cos(-core.camera.rotation.z);
+				core.camera.position.y -= .25 * Math.sin(-core.camera.rotation.z);
+				core.camera.position.z += .25 * Math.sin(-core.camera.rotation.y) * Math.cos(-core.camera.rotation.z);
+			}
+	
+			if(core.input.pc.keyboard.includes(65)) { // A
+				core.camera.position.x -= .25 * Math.cos(-core.camera.rotation.y) * Math.cos(-core.camera.rotation.z);
+				core.camera.position.y += .25 * Math.sin(-core.camera.rotation.z);
+				core.camera.position.z -= .25 * Math.sin(-core.camera.rotation.y) * Math.cos(-core.camera.rotation.z);
+			}
+	
+			if(core.input.pc.keyboard.includes(69)) { // E
+				core.camera.position.x += .25 * Math.sin(-core.camera.rotation.y) * Math.sin(-core.camera.rotation.x);
+				core.camera.position.y += .25 * Math.cos(-core.camera.rotation.x + core.camera.rotation.z);
+				core.camera.position.z -= .25 * Math.cos(-core.camera.rotation.y) * Math.sin(-core.camera.rotation.x);
+			}
+	
+			if(core.input.pc.keyboard.includes(81)) { // Q
+				core.camera.position.x -= .25 * Math.sin(-core.camera.rotation.y) * Math.sin(-core.camera.rotation.x)// * Math.sin(-core.camera.rotation.z);
+				core.camera.position.y -= .25 * Math.cos(-core.camera.rotation.x);
+				core.camera.position.z += .25 * Math.cos(-core.camera.rotation.y) * Math.sin(-core.camera.rotation.x)// * Math.sin(-core.camera.rotation.z);
+			}
+	
+			/*
+	
+			if(core.input.pc.keyboard.includes(16)) // SHIFT
+				core.camera.rotation.z += .015;
+	
+			if(core.input.pc.keyboard.includes(32)) // SPACE
+				core.camera.rotation.z -= .015;
+	
+			*/
+	
+			if(core.camera.rotation.x > Math.PI / 2 - .001)
+				core.camera.rotation.x = Math.PI / 2 - .001;
+	
+			else if(core.camera.rotation.x < -Math.PI / 2 + .001)
+				core.camera.rotation.x = -Math.PI / 2 + .001;
+		}
+	};
+	
+	module.exports = [
+		camera
+	];
+-
+	-
+		cameraModules.js
+	-
+-
+	var moduleDependencies = {
+		moduleUtilities: "moduleUtilities.js",
+		one: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONE.js",
+	};
+	
+	var moduleUtilities = require(moduleDependencies.moduleUtilities);
+	var one = require(moduleDependencies.one);
+	
+	var ball = {
+	
+		materialModule: null,
+	
+		onDefault: function(core) {
+			materialModule = moduleUtilities.getModule(core, "Material");
+		},
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			moduleUtilities.onChild(ace, "ball", (child) => {
+	
+				let diameter = moduleUtilities.getItem(child, "diameter", "1");
+				let ballMaterial = moduleUtilities.getItem(child, "material");
+			
+				let ball = BABYLON.MeshBuilder.CreateSphere(
+					"sphere",
+					{ diameter: Number(diameter) },
+					core.scene
+				);
+				
+				if(ballMaterial != null) {
+	
+					ball.material = materialModule.getMaterial(core, ballMaterial);
+	
+					//ball.material.diffuseTexture.uScale = 1;
+					ball.material.diffuseTexture.vScale = -1;
+				}
+	
+				entity.components.push(ball);
+			})
+		}
+	};
+	
+	var ground = {
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			if(one.getChild(ace, "ground") != null) {
+				
+				let item = one.getChild(ace, "ground");
+	
+				let texture = moduleUtilities.getItem(item, "texture");
+				let map = moduleUtilities.getItem(item, "map");
+				let subdivisions = Number(moduleUtilities.getItem(item, "subdivisions", "1000"));
+				let width = Number(moduleUtilities.getItem(item, "width", "1"));
+				let length = Number(moduleUtilities.getItem(item, "length", "1"));
+				let height = Number(moduleUtilities.getItem(item, "height", "0"));
+	
+				var groundMaterial = new BABYLON.StandardMaterial("ground", core.scene);
+	
+				if(texture != null)
+					groundMaterial.diffuseTexture = new BABYLON.Texture(texture, core.scene);
+	
+				let ground = null;
+	
+				if(map != null) {
+					
+					ground = BABYLON.Mesh.CreateGroundFromHeightMap(
+						"ground",
+						map,
+						width,
+						length,
+						subdivisions,
+						0,
+						height,
+						core.scene,
+						false,
+						function() {
+							
+						}
+					);
+	
+					ground.material = groundMaterial;
+				}
+	
+				else {
+	
+					ground = BABYLON.MeshBuilder.CreateGround(
+						"ground",
+						{
+							width: width,
+							height: length,
+							subdivisions: 4
+						},
+						core.scene
+					);
+	
+					ground.material = groundMaterial;
+				}
+	
+				entity.components.push(ground);
+			}
+		}
+	};
+	
+	var skybox = {
+	
+		skyboxes: [],
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			if(one.getChild(ace, "skybox") != null) {
+			
+				var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 10000.0 }, core.scene);
+		
+				var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", core.scene);
+				
+				skyboxMaterial.backFaceCulling = false;
+	
+				skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+					one.getChild(
+						one.getChild(ace, "skybox"),
+						"source"
+					).children[0].content, core.scene);
+	
+				skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+				skyboxMaterial.disableLighting = true;
+		
+				skybox.material = skyboxMaterial;
+	
+				this.skyboxes.push(skybox);
+	
+				entity.components.push(skybox);
+			}	
+		},
+	
+		onUpdate: function(core, delta) {
+			
+			for(let i = 0; i < this.skyboxes.length; i++)
+				this.skyboxes[i].position = core.camera.position;
+		}
+	};
+	
+	module.exports = [
+		ball,
+		ground,
+		skybox
+	];
+-
+	-
+		geometryModules.js
+	-
+-
+	var moduleDependencies = {
+		inputUtils: "https://raw.githubusercontent.com/Gallery-of-Kaeon/JavaScript-Utilities/master/JavaScript%20Utilities/Utilities/UI/Visual/General/input.js",
+		one: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONE.js",
+		onePlus: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONEPlus.js",
+		oneSuite: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONESuite.js",
+	};
+	
+	var inputUtils = require(moduleDependencies.inputUtils);
+	var one = require(moduleDependencies.one);
+	var onePlus = require(moduleDependencies.onePlus);
+	var oneSuite = require(moduleDependencies.oneSuite);
+	
+	var input = {
+	
+		onDefault: function(core) {
+			
+			core.input = { };
+	
+			inputUtils.addInput(core.element, core.input);
+		}
+	};
+	
+	var id = {
+	
+		reference: { },
+		tags: ["ID"],
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			if(one.getChild(ace, "id") != null)
+				this.reference[one.getChild(ace, "id").children[0].content] = entity;
+	
+		}
+	}
+	
+	var script = {
+	
+		scripts: [], // { language (optional, same as universal preprocessor), code }
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			if(one.getChild(ace, "script") != null)
+				this.scripts = this.scripts.concat(one.getChild(ace, "script", null, true));
+		},
+	
+		onUpdate: function(core, delta) {
+			
+			for(let i = 0; i < this.scripts.length; i++) {
+				
+				let start = one.getChild(this.scripts[i], "start");
+				let update = one.getChild(this.scripts[i], "update");
+	
+				if(!this.scripts[i].started)
+					this.executeSubscript(start, core, delta);
+	
+				this.executeSubscript(update, core, delta);
+	
+				this.scripts[i].started = true;
+			}
+		},
+	
+		executeSubscript: function(subscript, core, delta) {
+	
+			if(subscript == null)
+				return;
+	
+			let language = one.getChild(subscript, "language").children[0].content.toLowerCase().trim().split(" ").join("");
+			let source = one.getChild(subscript, "source").children[0].content;
+	
+			try {
+	
+				if(language == "kf" || language == "kaeonfusion")
+					oneSuite.process(source);
+	
+				if(language == "js" || language == "javascript")
+					((core, delta) => { eval(source); })(core, delta);
+			}
+	
+			catch(error) {
+	
+			}
+		}
+	};
+	
+	module.exports = [
+		id,
+		input,
+		script
+	];
+-
+	-
+		standardModules.js
+	-
+-
+	Component: Cursor: None
+	Component: Camera Control
+	
+	Component: Material
+	
+		ID: Earth Map
+		Texture: 'https://raw.githubusercontent.com/Kaeon-ACE/kaeon-ace.github.io/master/Staging/resource/textures/earth.jpg'
+	
+	Component: Audio
+	
+		Medium: YouTube
+		Source: '3oUu7N65s6I'
+	
+	Component: Skybox
+	
+		Source: 'https://raw.githubusercontent.com/Kaeon-ACE/kaeon-ace.github.io/master/Staging/resource/skybox/2/skybox'
+	
+	Entity { Component: ID: Earth }
+	
+		Component: Ball
+	
+			Material: Earth Map
+			Diameter: 4
+	
+		Script: Update: Language { JS }, Source
+	
+			-
+				core.call("rotate: Earth: 0, .00025, 0");
+			-
+	
+	#[
+	
+	Entity { Component: ID: Item 1 }
+	
+		Component: Model
+	
+			Source: 'https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/fish.glb'
+	
+		Component: Model
+	
+			Source: 'https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/shark.glb'
+	
+		Component: Script
+	
+			Start: Language { Kaeon FUSION }, Source
+	
+				-
+					Use: Kaeon United
+	
+					Log Line: 'Hello, Kaeon ACE!'
+				-
+	
+			Update: Language { JS }, Source
+		
+				-
+					core.call("move: Item 1: 0, 0, .0025");
+				-
+	
+	Entity { Component: ID: Test 1 }
+	
+		Component: Ground
+	
+			texture: 'https://raw.githubusercontent.com/Kaeon-ACE/kaeon-ace.github.io/master/Staging/resource/textures/earth.jpg'
+			map: 'https://d33wubrfki0l68.cloudfront.net/e07eb4ae422752ba27d10f0b4e47dae6be14405c/4dca2/img/how_to/heightmap/worldheightmap.jpg'
+			subdivisions: 2000
+			width: 10000
+			length: 10000
+			height: 60
+	
+	 ]#
+-
+	-
+		Game.op
+	-
+-
+	var moduleDependencies = {
+		one: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONE.js",
+		philosophersStone: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Philosophers-Stone/master/Philosopher's%20Stone/API/PhilosophersStone.js",
+	};
+	
+	var one = require(moduleDependencies.one);
+	var philosophersStone = require(moduleDependencies.philosophersStone);
+	
+	function getItem(element, item, defaultOption) {
+	
+		if(one.getChild(element, item) != null)
+			return one.getChild(element, item).children[0].content;
+	
+		return defaultOption;
+	}
+	
+	function getModule(core, tag) {
+	
+		return philosophersStone.retrieve(
+			philosophersStone.traverse(core),
+			function(item) {
+				return philosophersStone.isTagged(item, tag);
+			}
+		)[0];
+	}
+	
+	function onChild(element, child, callback) {
+		
+		if(one.getChild(element, child) != null)
+			callback(one.getChild(element, child));
+	}
+	
+	module.exports = {
+		getItem,
+		getModule,
+		onChild
+	};
+-
+	-
+		moduleUtilities.js
+	-
+-
+	var moduleDependencies = {
+		moduleUtilities: "moduleUtilities.js",
+		one: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONE.js",
+		onePlus: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONEPlus.js",
+		oneSuite: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-FUSION/master/Kaeon%20FUSION/Source/Engine/ONESuite.js",
+		philosophersStone: "https://raw.githubusercontent.com/Gallery-of-Kaeon/Philosophers-Stone/master/Philosopher's%20Stone/API/PhilosophersStone.js",
+		youtube: "https://raw.githubusercontent.com/Gallery-of-Kaeon/JavaScript-Utilities/master/JavaScript%20Utilities/Utilities/UI/Audio/playYoutubeAudio.js"
+	};
+	
+	var moduleUtilities = require(moduleDependencies.moduleUtilities);
+	var one = require(moduleDependencies.one);
+	var onePlus = require(moduleDependencies.onePlus);
+	var oneSuite = require(moduleDependencies.oneSuite);
+	var philosophersStone = require(moduleDependencies.philosophersStone);
+	var youtube = require(moduleDependencies.youtube);
+	
+	var audio = {
+	
+		tracks: [],
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			if(one.getChild(ace, "audio") != null) {
+	
+				let medium = "file";
+	
+				if(one.getChild(one.getChild(ace, "audio"), "medium") != null)
+					medium = one.getChild(one.getChild(ace, "audio"), "medium").children[0].content.trim().toLowerCase();
+		
+				let source = one.getChild(one.getChild(ace, "audio"), "source").children[0].content;
+	
+				if(medium == "file") {
+	
+					let track = new Audio(source);
+					track.loop = true;
+		
+					this.tracks.push(track);
+		
+					track.play();
+				}
+	
+				if(medium == "youtube")
+					youtube.playYoutubeAudio(source, null, true);
+			}
+		}
+	};
+	
+	var cursor = {
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			if(one.getChild(ace, "cursor") != null) {
+		
+				if(one.getChild(one.getChild(ace, "cursor"), "none") != null)
+					core.element.style.cursor = "none";
+			}
+		}
+	};
+	
+	var light = {
+	
+		onDefault: function(core) {
+			new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), core.scene);
+			new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), core.scene);
+		}
+	};
+	
+	var material = {
+	
+		reference: { },
+		tags: ["Material"],
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			moduleUtilities.onChild(ace, "material", (child) => {
+				
+				let id = moduleUtilities.getItem(child, "id");
+	
+				if(id == null)
+					return;
+	
+				let texture = moduleUtilities.getItem(child, "texture");
+				
+				let item = material.getMaterial(core, id);
+	
+				if(texture != null)
+					item.diffuseTexture = new BABYLON.Texture(texture, core.scene);
+			});
+		},
+	
+		getMaterial(core, id) {
+			
+			if(material.reference.id == null)
+				material.reference.id = new BABYLON.StandardMaterial("material_" + id, core.scene);
+	
+			return material.reference.id;
+		}
+	};
+	
+	var model = {
+	
+		onDeserialize: function(core, ace, entity) {
+	
+			if(one.getChild(ace, "model") != null) {
+				
+				let source = one.getChild(one.getChild(ace, "model"), "source").children[0].content;
+		
+				let model = BABYLON.SceneLoader.ImportMesh("", source.substring(0, source.lastIndexOf("/") + 1), source.substring(source.lastIndexOf("/") + 1), core.scene, function (meshes) {          
+					entity.components = entity.components.concat(meshes);
+				});
+			}
+		}
+	};
+	
+	var move = {
+	
+		id: null,
+	
+		onDefault: function(core) {
+			
+			move.id = philosophersStone.retrieve(
+				philosophersStone.traverse(core),
+				function(item) {
+					return philosophersStone.isTagged(item, "ID");
+				}
+			)[0];
+		},
+	
+		onUpdate: function(core, delta) {
+			// console.log(delta);
+		},
+	
+		onCall: function(core, data) {
+			
+			let command = onePlus.readONEPlus("" + data);
+	
+			if(one.getChild(command, "move") != null) {
+				
+				let item = one.getChild(command, "move").children[0];
+	
+				let entity = move.id.reference[item.content];
+	
+				for(let i = 0; i < entity.components.length; i++) {
+					
+					if(entity.components[i].position != null) {
+						entity.components[i].position.x += Number(item.children[0].content);
+						entity.components[i].position.y += Number(item.children[1].content);
+						entity.components[i].position.z += Number(item.children[2].content);
+					}
+				}
+			}
+		}
+	};
+	
+	var rotate = {
+	
+		id: null,
+	
+		onDefault: function(core) {
+			
+			rotate.id = philosophersStone.retrieve(
+				philosophersStone.traverse(core),
+				function(item) {
+					return philosophersStone.isTagged(item, "ID");
+				}
+			)[0];
+		},
+	
+		onUpdate: function(core, delta) {
+			// console.log(delta);
+		},
+	
+		onCall: function(core, data) {
+			
+			let command = onePlus.readONEPlus("" + data);
+	
+			if(one.getChild(command, "rotate") != null) {
+				
+				let item = one.getChild(command, "rotate").children[0];
+	
+				let entity = move.id.reference[item.content];
+	
+				for(let i = 0; i < entity.components.length; i++) {
+					
+					if(entity.components[i].rotation != null) {
+						entity.components[i].rotation.x += Number(item.children[0].content);
+						entity.components[i].rotation.y += Number(item.children[1].content);
+						entity.components[i].rotation.z += Number(item.children[2].content);
+					}
+				}
+			}
+		}
+	};
+	
+	module.exports = [
+		audio,
+		cursor,
+		light,
+		material,
+		model,
+		move,
+		rotate
+	];
+-
+	-
+		miscModules.js
+	-
+-
+	// format: { seed: n. time: n, manual: [] }
+	// object: { id, mass, diameter, tilt, type, content, parent, distance, latitude, longitude }
+	// content: { global map, local maps, sea level, volcano points, atmosphere, structures }
+	
+	// parent, children; IDs
+	getEntities(settings, id, options) {
+	
+	}
+	
+	// IDs
+	getLocale(settings, position, range, options) {
+	
+	}
+	
+	getProperties(settings, id, options) {
+	
+	}
+	
+	getRelativeLocation(settings, id, latitude, longitude, distance, options) {
+	
+	}
+	
+	module.exports = {
+		getEntities,
+		getLocale,
+		getProperties,
+		getRelativeLocation
+	};
+-
+	-
+		generalUniverse.js
+	-
+-
+	var generalUniverse = require("generalUniverse.js");
+	
+	
+-
+	-
+		xp.js
+	-

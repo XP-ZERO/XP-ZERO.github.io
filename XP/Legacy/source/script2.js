@@ -1,0 +1,1 @@
+document.documentElement.innerHTML = "<pre id=\"content\" style=\"display: none;\">CONTENT</pre>";

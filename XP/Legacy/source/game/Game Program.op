@@ -1,0 +1,50 @@
+Game
+
+	Philosophy
+
+		-
+			This is a game.
+		-
+
+	Program
+
+		Use
+		
+			'https://raw.githubusercontent.com/Gallery-of-Kaeon/JavaScript-Utilities/master/JavaScript%20Utilities/United%20Bootstrap/Standard.js'
+			'https://raw.githubusercontent.com/Kaeon-ACE/kaeon-ace.github.io/master/Staging/source/game/KaeonACEInterface.js'
+			'https://raw.githubusercontent.com/Gallery-of-Kaeon/Kaeon-ACE/master/Kaeon%20ACE/API/Kaeon%20ACE/Babylon/KaeonACEModules.js'
+		
+		Define
+		
+			Component: Cursor: None
+			Component: Camera Control
+		
+			(] KF [> i: 0; Scope: Log: 'Component: Ball'; i { Add: i, 1 } Loop: Less: i, 10 <)
+
+			Component: Skybox
+		
+				Source: 'https://raw.githubusercontent.com/Kaeon-ACE/kaeon-ace.github.io/master/Staging/resource/skybox/1/skybox'
+		
+			Component: Audio
+		
+				Source: 'https://raw.githubusercontent.com/Kaeon-ACE/kaeon-ace.github.io/master/Staging/resource/music/Moonlight.mp3'
+		
+			Entity { Component: ID: Item 1 }
+		
+				Component: Model
+		
+					Source: 'https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/fish.glb'
+		
+				Component: Model
+		
+					Source: 'https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/shark.glb'
+		
+				Component: Script: Code
+				
+					-
+						Call: 'move: Item 1: 0, 0, .05'
+					-
+		
+		Scope
+		
+			Log Line: 'Hello, Kaeon ACE!'

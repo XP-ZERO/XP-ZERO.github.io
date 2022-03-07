@@ -1,0 +1,28 @@
+Component: Cursor: None
+Component: Camera Control
+
+Component: Skybox
+
+	Source: 'https://raw.githubusercontent.com/Kaeon-ACE/kaeon-ace.github.io/master/Staging/resource/skybox/1/skybox'
+
+Component: Audio
+
+	Source: 'https://raw.githubusercontent.com/Kaeon-ACE/kaeon-ace.github.io/master/Staging/resource/music/Moonlight.mp3'
+
+Entity { Component: ID: Item 1 }
+
+	Component: Model
+
+		Source: 'https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/fish.glb'
+
+	Component: Model
+
+		Source: 'https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/shark.glb'
+
+	Component: Script: Code
+	
+		-
+			core.call("move: Item 1: 0, 0, .05");
+
+			// core.camera.position.y += .02; // works
+		-

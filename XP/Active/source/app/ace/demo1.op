@@ -1,0 +1,48 @@
+Component: Cursor: None
+Component: Camera Control
+
+Component: Skybox
+
+	Source: 'https://gitlab.com/k2521/XP/-/raw/master/Staging/resource/skybox/1/skybox'
+
+Component: Audio
+
+	Medium: YouTube
+	Source: 'a_3nFH9ilQw'
+
+Entity { Component: ID: Item 1 }
+
+	Component: Model
+
+		Source: 'https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/fish.glb'
+
+	Component: Model
+
+		Source: 'https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/shark.glb'
+
+	Component: Script
+
+		Start: Language { Kaeon FUSION }, Source
+
+			-
+				Use: Kaeon United
+
+				Log Line: 'Hello, Kaeon ACE!'
+			-
+
+		Update: Language { JS }, Source
+	
+			-
+				core.call("move: Item 1: 0, 0, .05");
+			-
+
+Entity { Component: ID: Test 1 }
+
+	Component: Ground
+
+		texture: 'https://gitlab.com/k2521/XP/-/raw/master/Staging/resource/skybox/1/skybox_nx.jpg'
+		map: 'https://d33wubrfki0l68.cloudfront.net/e07eb4ae422752ba27d10f0b4e47dae6be14405c/4dca2/img/how_to/heightmap/worldheightmap.jpg'
+		subdivisions: 2000
+		width: 10000
+		length: 10000
+		height: 60

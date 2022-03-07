@@ -1,0 +1,138 @@
+var ui = require("https://raw.githubusercontent.com/Library-of-Kaeon/Library-of-Kaeon/master/Library%20of%20Kaeon/3%20-%20Collection/1%20-%20Computation/1%20-%20APIs/4%20-%20Utilities/10%20-%20UI/1%20-%20JavaScript/1%20-%20Source/ui.js");
+
+var keys = [];
+
+document.title = "Pong";
+
+ui.setStyle(document.documentElement, [["overflow", "hidden"]]);
+
+document.addEventListener(
+	'keydown',
+	function(event) {
+
+		if(!keys.includes(event.code))
+			keys.push(event.code);
+	}
+);
+
+document.addEventListener(
+	'keyup',
+	function(event) {
+
+		if(keys.includes(event.code))
+			keys.splice(keys.indexOf(event.code), 1);
+	}
+);
+
+var left =
+	ui.setStyle(
+		ui.create("div"),
+		[
+			["background", "black"],
+			["position", "absolute"],
+			["left", "10vw"],
+			["top", "40vh"],
+			["width", "2.5vw"],
+			["height", "20vh"]
+		]
+	);
+
+var right =
+	ui.setStyle(
+		ui.create("div"),
+		[
+			["background", "black"],
+			["position", "absolute"],
+			["left", "87.5vw"],
+			["top", "40vh"],
+			["width", "2.5vw"],
+			["height", "20vh"]
+		]
+	);
+
+var ball =
+	ui.setStyle(
+		ui.create("div"),
+		[
+			["background", "black"],
+			["position", "absolute"],
+			["left", "48.775vw"],
+			["top", "48.775vh"],
+			["width", "2.5vw"],
+			["height", "2.5vh"]
+		]
+	);
+
+var leftPos = 40;
+var rightPos = 40;
+
+var ballPos = [48.775, 48.775];
+var ballVel = [.35, .25];
+
+ui.extend(document.documentElement, left);
+ui.extend(document.documentElement, right);
+ui.extend(document.documentElement, ball);
+
+setInterval(update, 1000 / 60);
+
+function update() {
+
+	if(keys.includes("KeyW"))
+		leftPos -= .5;
+
+	if(keys.includes("KeyS"))
+		leftPos += .5;
+
+	if(keys.includes("ArrowUp"))
+		rightPos -= .5;
+
+	if(keys.includes("ArrowDown"))
+		rightPos += .5;
+	
+	if(leftPos < 0)
+		leftPos = 0;
+
+	if(leftPos > 80)
+		leftPos = 80;
+	
+	if(rightPos < 0)
+		rightPos = 0;
+
+	if(rightPos > 80)
+		rightPos = 80;
+	
+	ballPos[0] += ballVel[0];
+	ballPos[1] += ballVel[1];
+	
+	if(ballPos[0] < -5 || ballPos[0] > 105) {
+
+		ballVel = [-ballVel[0], -ballVel[1]];
+
+		ballPos = [48.775, 48.775];
+	}
+	
+	if(ballPos[1] < 0 || ballPos[1] > 97.5)
+		ballVel[1] = -ballVel[1];
+	
+	if(
+		ballPos[1] + 2.5 > leftPos &&
+		ballPos[1] < leftPos + 20 &&
+		ballPos[0] + .5 > 10 &&
+		ballPos[0] + .5 < 12.5) {
+		
+		ballVel[0] = Math.abs(ballVel[0]);
+	}
+	
+	if(
+		ballPos[1] + 2.5 > rightPos &&
+		ballPos[1] < rightPos + 20 &&
+		ballPos[0] + 2 > 87.5 &&
+		ballPos[0] + 2 < 90) {
+		
+		ballVel[0] = -Math.abs(ballVel[0]);
+	}
+
+	ui.setStyle(left, [["top", leftPos + "vh"]]);
+	ui.setStyle(right, [["top", rightPos + "vh"]]);
+	ui.setStyle(ball, [["left", ballPos[0] + "vw"], ["top", ballPos[1] + "vh"]]);
+}

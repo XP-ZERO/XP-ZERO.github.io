@@ -1,0 +1,1 @@
+require("https://raw.githubusercontent.com/Kaeon-ACE/GhostHost-XP/master/GhostHost%20XP/bar.js").bar();

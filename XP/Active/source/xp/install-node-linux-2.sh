@@ -15,3 +15,10 @@ if which node > /dev/null
 				echo "installing node for ARM 7+..."
 			fi
 	fi
+
+if [ $ARM == "armv6l" ]
+	then
+		echo "installing node for ARM 6..."
+	else
+		echo "installing node for ARM 7+..."
+	fi

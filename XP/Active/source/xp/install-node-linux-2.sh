@@ -2,7 +2,7 @@
 
 arm = $(uname -m)
 
-echo $arm
+echo "$arm"
 
 if which node > /dev/null
 	then

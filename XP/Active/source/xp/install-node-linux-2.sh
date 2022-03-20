@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "test"
+
 arm = $(uname -m)
 
 echo "$arm"

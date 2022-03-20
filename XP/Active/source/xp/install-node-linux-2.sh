@@ -2,9 +2,9 @@
 
 echo "test"
 
-arm = $(uname -m)
+ARM=$(uname -m)
 
-echo "$arm"
+echo "${ARM}"
 
 if which node > /dev/null
 	then

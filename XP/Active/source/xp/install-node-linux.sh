@@ -16,7 +16,7 @@ if which node > /dev/null
 			else
 				wget https://nodejs.org/dist/v16.14.2/node-v16.14.2-linux-armv7l.tar.xz
 				tar -xJf node-v16.14.2-linux-armv7l.tar.xz
-				sudo cp -r node-v16.14.2-linux-armv7l/* /usr/local/
+				sudo cp -r node-v16.14.2-linux-armv7l/* /usr/
 				rm -r node-v16.14.2-linux-armv7l
 				rm node-v16.14.2-linux-armv7l.tar.xz
 			fi

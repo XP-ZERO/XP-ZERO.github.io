@@ -4,8 +4,8 @@
 
 var moduleDependencies = {
 	cors: "https://ghost-cors.herokuapp.com/",
-	defaultInterface: "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/3%20-%20Collection/1%20-%20Implementation/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/KaeonUnitedDefaultInterface.json",
-	ONESuite: "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/3%20-%20Collection/1%20-%20Implementation/1%20-%20APIs/1%20-%20Core/1%20-%20ONE/6%20-%20ONE%20Suite/1%20-%20JavaScript/1%20-%20Source/ONESuite.js",
+	defaultInterface: "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/KaeonUnitedDefaultInterface.json",
+	ONESuite: "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/1%20-%20Core/1%20-%20ONE/6%20-%20ONE%20Suite/1%20-%20JavaScript/1%20-%20Source/ONESuite.js",
 };
 
 function appendInterface(main, resource) {
@@ -77,7 +77,9 @@ function executeCommand(args, intervals) {
 
 				try {
 
-					execSync("npm install " + item);
+					if(!item.startsWith("http://") && !item.startsWith("https://"))
+						execSync("npm install " + item);
+						
 					onDependency(item, "install");
 
 					interfaces.push(item);
@@ -99,7 +101,9 @@ function executeCommand(args, intervals) {
 				try {
 
 					onDependency(item, "uninstall");
-					execSync("npm uninstall " + item);
+					
+					if(!item.startsWith("http://") && !item.startsWith("https://"))
+						execSync("npm uninstall " + item);
 
 					interfaces.splice(interfaces.indexOf(item), 1);
 				}
@@ -380,12 +384,11 @@ function executeScript() {
 	}
 }
 
-function fetchOnlineResource(path, cors) {
+function fetchOnlineResource(path) {
 
 	try {
 
-		if(cors)
-			path = moduleDependencies.cors + path;
+		path = moduleDependencies.cors + path;
 		
 		let rawFile = new XMLHttpRequest();
 

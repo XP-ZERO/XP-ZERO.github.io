@@ -1,31 +1,31 @@
 {
 	"components": [
 		{
-			"reference": "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/1%20-%20Components/1%20-%20Console/1%20-%20Assemble/kaeonUnitedCommandAssemble.js",
+			"reference": "https://raw.githubusercontent.com/XP-ZERO/XP-ZERO.github.io/master/XP/Active/source/util/united/1%20-%20Interface/1%20-%20Console/1%20-%20Assemble/kucAssemble.js",
 			"environment": "javascript"
 		},
 		{
-			"reference": "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/1%20-%20Components/1%20-%20Console/2%20-%20Disassemble/kaeonUnitedCommandDisassemble.js",
+			"reference": "https://raw.githubusercontent.com/XP-ZERO/XP-ZERO.github.io/master/XP/Active/source/util/united/1%20-%20Interface/1%20-%20Console/2%20-%20Disassemble/kucDisassemble.js",
 			"environment": "javascript"
 		},
 		{
-			"reference": "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/1%20-%20Components/1%20-%20Console/3%20-%20JS/kaeonUnitedCommandJS.js",
+			"reference": "https://raw.githubusercontent.com/XP-ZERO/XP-ZERO.github.io/master/XP/Active/source/util/united/1%20-%20Interface/1%20-%20Console/3%20-%20JS/kucJS.js",
 			"environment": "javascript"
 		},
 		{
-			"reference": "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/1%20-%20Components/1%20-%20Console/4%20-%20Parse/kaeonUnitedCommandParse.js",
+			"reference": "https://raw.githubusercontent.com/XP-ZERO/XP-ZERO.github.io/master/XP/Active/source/util/united/1%20-%20Interface/1%20-%20Console/4%20-%20Parse/kucParse.js",
 			"environment": "javascript"
 		},
 		{
-			"reference": "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/1%20-%20Components/1%20-%20Console/5%20-%20Preprocess/kaeonUnitedCommandPreprocess.js",
+			"reference": "https://raw.githubusercontent.com/XP-ZERO/XP-ZERO.github.io/master/XP/Active/source/util/united/1%20-%20Interface/1%20-%20Console/5%20-%20Preprocess/kucPreprocess.js",
 			"environment": "javascript"
 		},
 		{
-			"reference": "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/1%20-%20Components/1%20-%20Console/6%20-%20Process/kaeonUnitedCommandProcess.js",
+			"reference": "https://raw.githubusercontent.com/XP-ZERO/XP-ZERO.github.io/master/XP/Active/source/util/united/1%20-%20Interface/1%20-%20Console/6%20-%20Process/kucProcess.js",
 			"environment": "javascript"
 		},
 		{
-			"reference": "https://raw.githubusercontent.com/Atlas-of-Kaeon/Atlas-of-Kaeon.github.io/master/Repository%20of%20Kaeon/2%20-%20Collection/1%20-%20General/2%20-%20Source/1%20-%20APIs/3%20-%20United/1%20-%20Resources/1%20-%20Default%20Interface/1%20-%20Components/1%20-%20Console/7%20-%20UCC/kaeonUnitedCommandUCC.js",
+			"reference": "https://raw.githubusercontent.com/XP-ZERO/XP-ZERO.github.io/master/XP/Active/source/util/united/1%20-%20Interface/1%20-%20Console/7%20-%20UCC/kucUCC.js",
 			"environment": "javascript"
 		},
 		{
